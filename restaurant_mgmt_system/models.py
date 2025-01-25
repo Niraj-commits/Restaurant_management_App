@@ -16,8 +16,8 @@ class Food(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     price = models.DecimalField(decimal_places=2,default=0.00,max_digits=500)
     
-    def __str__(self):
-        return self.name
+    # def __str__(self):
+    #     return self.name
     
     
 class Table(models.Model):
