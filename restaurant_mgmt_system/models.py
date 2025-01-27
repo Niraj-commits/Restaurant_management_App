@@ -16,25 +16,25 @@ class Food(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     price = models.DecimalField(decimal_places=2,default=0.00,max_digits=500)
     
-    # def __str__(self):
-    #     return self.name
+    def __str__(self):
+        return self.name
     
     
 class Table(models.Model):
-    number = models.CharField(max_length=5)
+    name = models.CharField(max_length=5)
     is_available = models.BooleanField(default=False)
     
-    # def __str__(self):
-    #     return self.number
+    def __str__(self):
+        return self.name
     
 
 class Order(models.Model):
-    order_status = [('p','pending'),('c','confirmed')] 
+    order_status = [('p','pending'),('a','accepted')] 
     # or
     
     # PENDING = 'p'
-    # COMPLETED = 'c'
-    # order_status = {PENDING:'pending',COMPLETED:'completed'}
+    # Accepted = 'a'
+    # order_status = {PENDING:'pending',Accepted:'accepted'}
     
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     table_id = models.ForeignKey(Table,on_delete=models.CASCADE)
