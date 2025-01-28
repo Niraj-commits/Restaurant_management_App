@@ -4,6 +4,9 @@ from rest_framework.decorators import api_view
 from .models import *
 from .serializers import *
 from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework import generics
+
 
 @api_view(['GET','POST'])
 def categoryList(request):
@@ -14,20 +17,20 @@ def categoryList(request):
     
     
     elif request.method == "POST":
-        serializer = CategorySerializer(data = request.data)
+        serializer = CategorySerializer(data = request.data) #deserializing for changing data into dict
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
         return Response({"details":"Data Has Been Added"},status = status.HTTP_201_CREATED)
     
-@api_view(['GET','DELETE'])    
+@api_view(['GET','DELETE','PUT'])    
 def singleCategoryData(request,pk):
     single_category_data = Category.objects.get(pk = pk)
     if request.method == "GET":
         serializer = CategorySerializer(single_category_data)
         return Response(serializer.data)   
     
-    else:
+    elif request.method == "DELETE":
         datacount = Category.objects.filter(food__category = single_category_data).count() #check from orderitemmodel and then food model for connections
         
         if datacount > 0 :
@@ -36,7 +39,13 @@ def singleCategoryData(request,pk):
         else:
             single_category_data.delete()
             return Response({"details":"Category Deleted"})
+    
+    elif request.method == "PUT":
         
+        serializer = CategorySerializer(single_category_data,data = request.data) #for updating we need instance
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"Details":"Data is updated"},status=status.HTTP_200_OK)
         
 @api_view(['GET','POST'])
 def foodList(request):
@@ -50,7 +59,6 @@ def foodList(request):
         serializer = FoodSerializer( data = request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        
         return Response({"Details":"Data has been added"},status=status.HTTP_200_OK)
     
 @api_view(['GET','DELETE'])
