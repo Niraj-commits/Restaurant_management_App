@@ -61,14 +61,14 @@ def foodList(request):
         serializer.save()
         return Response({"Details":"Data has been added"},status=status.HTTP_200_OK)
     
-@api_view(['GET','DELETE'])
+@api_view(['GET','DELETE','PUT'])
 def singleFoodData(request,pk):
     food_data = Food.objects.get(pk = pk) 
     if request.method == "GET":
         serializer = FoodSerializer(food_data)
         return Response(serializer.data)
     
-    else:
+    elif request.method == "DELETE":
         no_of_apperance = OrderItem.objects.filter(food = food_data).count() #checking for relation
         if no_of_apperance > 0:
             return Response({"details":"Data is used can't delete"},status=status.HTTP_404_NOT_FOUND)
@@ -77,6 +77,12 @@ def singleFoodData(request,pk):
             food_data.delete()
             return Response({"details":"Data has been deleted"},status=status.HTTP_200_OK)
 
+    elif request.method == "PUT":
+        serializer = FoodSerializer(food_data,data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"Details":"Data has been updated"},status=status.HTTP_200_OK)
+             
 @api_view(['GET','POST'])
 def tableList(request):
     if request.method == "GET":
@@ -89,7 +95,7 @@ def tableList(request):
         serializer.save()
         return Response({"details":"Data has been added"},status=status.HTTP_200_OK)
 
-@api_view(['GET','DELETE'])
+@api_view(['GET','DELETE','PUT'])
 def singleTableData(request,pk):
     
     table_data = Table.objects.get(pk = pk)
@@ -98,10 +104,24 @@ def singleTableData(request,pk):
         return Response(serializer.data)
     
     elif request.method == "DELETE":
-        table_data.delete()
-        return Response ({"Details":"Data has been deleted"},status=status.HTTP_404_NOT_FOUND) 
+        
+        connections = Order.objects.filter(table_id = table_data).count()
+        
+        if connections > 0:
+            return Response({"Details":"Bound value cannot delete"},status=status.HTTP_226_IM_USED)
+        
+        else:
+            table_data.delete()
+            return Response ({"Details":"Data has been deleted"},status=status.HTTP_404_NOT_FOUND) 
 
-    
+    elif request.method == "PUT":
+        
+        serializer = TableSerializer(table_data,data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"details":"Data has been updated"})
+        
+        
 @api_view(['GET','POST'])
 def orderList(request):
     if request.method == "GET":
@@ -110,20 +130,20 @@ def orderList(request):
         return Response(serializer.data)
     
     elif request.method == "POST":
-        serializer = OrderSerializer(data = serializer.data)
+        serializer = OrderSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"Details":"Data Has been added"},status=status.HTTP_200_OK)
 
-@api_view(['GET','DELETE'])
+@api_view(['GET','DELETE','PUT'])
 def singleOrderData(request,pk):
     order_data = Order.objects.get(pk = pk)
     if request.method == "GET":
         serializer = OrderSerializer(order_data)
-        return Response({"Details":"Data Has been added"})
+        return Response(serializer.data)
     
     elif request.method == "DELETE":
-        use_count = OrderItem.objects.filter(order = order_data).count
+        use_count = OrderItem.objects.filter(order = order_data).count()
         if use_count > 0 :
             return Response({"Details":"Cannot delete already using"},status=status.HTTP_226_IM_USED)
         
@@ -131,6 +151,11 @@ def singleOrderData(request,pk):
             order_data.delete()
             return Response({"Details":"Data has been deleted"},status=status.HTTP_200_OK)
         
+    elif request.method == "PUT":
+        serializer = OrderSerializer(order_data,data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"Details":"Details Have been updated"})
 
 @api_view(['GET','POST'])
 def orderItemList(request):
@@ -140,12 +165,12 @@ def orderItemList(request):
         return Response(serializer.data)
     
     elif request.method == "POST":
-        serializer = OrderItemsSerializer( data = serializer.data)
+        serializer = OrderItemsSerializer( data = request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"Details":"Data is saved"},status=status.HTTP_200_OK)
     
-@api_view(["GET","DELETE"])
+@api_view(["GET","DELETE","PUT"])
 def singleOrderItem(request,pk):
     
     orderItemData = OrderItem.objects.get(pk = pk)
@@ -156,6 +181,11 @@ def singleOrderItem(request,pk):
     elif request.method == "DELETE":
         orderItemData.delete()
         return Response({"Details":"Data has been deleted"},status=status.HTTP_204_NO_CONTENT)
-
+    
+    elif request.method == "PUT":
+        serializer = OrderItemsSerializer(orderItemData,data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"Details":"Data Has Been Updated"})
 
 
