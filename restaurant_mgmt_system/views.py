@@ -3,49 +3,49 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import *
 from .serializers import *
-from rest_framework import status
+from rest_framework import status,viewsets
 from rest_framework.views import APIView
 from rest_framework import generics
 
 
-@api_view(['GET','POST'])
-def categoryList(request):
-    if request.method == "GET":
-        list = Category.objects.all()
-        serializer = CategorySerializer(list,many=True)
-        return Response(serializer.data)
+# @api_view(['GET','POST'])
+# def categoryList(request):
+#     if request.method == "GET":
+#         list = Category.objects.all()
+#         serializer = CategorySerializer(list,many=True)
+#         return Response(serializer.data)
     
     
-    elif request.method == "POST":
-        serializer = CategorySerializer(data = request.data) #deserializing for changing data into dict
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+#     elif request.method == "POST":
+#         serializer = CategorySerializer(data = request.data) #deserializing for changing data into dict
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
         
-        return Response({"details":"Data Has Been Added"},status = status.HTTP_201_CREATED)
+#         return Response({"details":"Data Has Been Added"},status = status.HTTP_201_CREATED)
     
-@api_view(['GET','DELETE','PUT'])    
-def singleCategoryData(request,pk):
-    single_category_data = Category.objects.get(pk = pk)
-    if request.method == "GET":
-        serializer = CategorySerializer(single_category_data)
-        return Response(serializer.data)   
+# @api_view(['GET','DELETE','PUT'])    
+# def singleCategoryData(request,pk):
+#     single_category_data = Category.objects.get(pk = pk)
+#     if request.method == "GET":
+#         serializer = CategorySerializer(single_category_data)
+#         return Response(serializer.data)   
     
-    elif request.method == "DELETE":
-        datacount = Category.objects.filter(food__category = single_category_data).count() #check from orderitemmodel and then food model for connections
+#     elif request.method == "DELETE":
+#         datacount = Category.objects.filter(food__category = single_category_data).count() #check from orderitemmodel and then food model for connections
         
-        if datacount > 0 :
-            return Response({"details":"sorry the category is linked with other tables"},status= status.HTTP_404_NOT_FOUND)
+#         if datacount > 0 :
+#             return Response({"details":"sorry the category is linked with other tables"},status= status.HTTP_404_NOT_FOUND)
         
-        else:
-            single_category_data.delete()
-            return Response({"details":"Category Deleted"})
+#         else:
+#             single_category_data.delete()
+#             return Response({"details":"Category Deleted"})
     
-    elif request.method == "PUT":
+#     elif request.method == "PUT":
         
-        serializer = CategorySerializer(single_category_data,data = request.data) #for updating we need instance
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"Details":"Data is updated"},status=status.HTTP_200_OK)
+#         serializer = CategorySerializer(single_category_data,data = request.data) #for updating we need instance
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({"Details":"Data is updated"},status=status.HTTP_200_OK)
         
 @api_view(['GET','POST'])
 def foodList(request):
@@ -120,8 +120,7 @@ def singleTableData(request,pk):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"details":"Data has been updated"})
-        
-        
+               
 @api_view(['GET','POST'])
 def orderList(request):
     if request.method == "GET":
@@ -173,6 +172,7 @@ def orderItemList(request):
 @api_view(["GET","DELETE","PUT"])
 def singleOrderItem(request,pk):
     
+    
     orderItemData = OrderItem.objects.get(pk = pk)
     if request.method == "GET":
         serializer = OrderItemsSerializer(orderItemData)
@@ -187,5 +187,36 @@ def singleOrderItem(request,pk):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"Details":"Data Has Been Updated"})
+    
 
+# Using ViewSets
 
+class category(viewsets.ViewSet):
+    def list(self,request):
+        category = Category.objects.all()
+        serializers = CategorySerializer(category,many= True)
+        return Response(serializers.data)
+    
+    def retrieve(self,request,pk):
+        queryset = Category.objects.get(pk = pk)
+        serializer = CategorySerializer(queryset)
+        return Response(serializer.data)
+        
+    def update(self,request,pk):
+        queryset = Category.objects.get(pk = pk)
+        serializer = CategorySerializer(queryset, data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"Details":"Data has been updated"},status=status.HTTP_200_OK)
+    
+    def destroy(self,request,pk):
+        queryset = Category.objects.get(pk = pk)
+        
+        total_usage = OrderItem.objects.filter(food__category = queryset).count()
+        
+        if total_usage > 0 :
+            return Response({"Details":"Category is used"},status=status.HTTP_226_IM_USED)
+        
+        else:
+            queryset.delete()
+            return Response({"Details":"Data is Deleted"},status=status.HTTP_200_OK)

@@ -1,17 +1,27 @@
 from rest_framework import serializers
 from .models import *
 
-class CategorySerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only = True)
-    name = serializers.CharField()
+
+# class CategorySerializer(serializers.Serializer):
+#     id = serializers.IntegerField(read_only = True)
+#     name = serializers.CharField()
     
-    def create(self,validated_data):
-        return Category.objects.create(**validated_data)
+#     def create(self,validated_data):
+#         return Category.objects.create(**validated_data)
     
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name',instance.name)
-        instance.save()
-        return instance
+#     def update(self, instance, validated_data):
+#         instance.name = validated_data.get('name',instance.name)
+#         instance.save()
+#         return instance
+    
+# Using Model Serializers Can use ModelSerializer instead for the code above
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id','name'] 
+        # also can be defined using
+        # fields = '__all__'
+        
     
 class FoodSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only = True)
