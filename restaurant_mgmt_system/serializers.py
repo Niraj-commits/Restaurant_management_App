@@ -22,24 +22,33 @@ class CategorySerializer(serializers.ModelSerializer):
         # also can be defined using
         # fields = '__all__'
         
-    
-class FoodSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only = True)
-    name = serializers.CharField()
-    description = serializers.CharField()
-    category = serializers.PrimaryKeyRelatedField(queryset = Category.objects.all())
-    price = serializers.IntegerField()
-    
-    def create(self, validated_data):
-        return Food.objects.create(**validated_data)
-    
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name',instance.name)
-        instance.description = validated_data.get('description',instance.description)
-        instance.category = validated_data.get('category',instance.category)
-        instance.price = validated_data.get('price',instance.price)
+    def create(self,validated_data):
+        occurences = self.Meta.model.objects.filter(name = validated_data.get('name')).count()
+        if occurences > 0:
+            raise serializers.ValidationError("Category Already Exist")
+        
+        category = self.Meta.model(**validated_data)
+        category.save()
+        return category 
+        
+    def update(self,instance,validated_data):
+        occurences = self.Meta.model.objects.filter(name = validated_data.get('name')).count()
+        
+        if occurences > 0:
+            raise serializers.ValidationError("Category Already Exist")
+        instance = self.Meta.model(**validated_data)
         instance.save()
         return instance
+            
+    
+class FoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Food
+        fields = ['id','name','description','category','price']
+        
+        def save(self,**kwargs):
+            validated_data = self.validated_data
+            occurences = self.Meta.model.objects.filter(name =validated_data.get('name')).count()
     
 
 class TableSerializer(serializers.Serializer):
