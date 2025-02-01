@@ -8,7 +8,7 @@ class food(admin.ModelAdmin):
     list_display = ['name','description','category','price']
     list_editable = ['category','price']
     search_fields = ['name','category']
-    list_filter = ['name']
+    list_filter = ['category']
     list_per_page = 15
     
 
@@ -17,8 +17,8 @@ class OrderItemInline(admin.TabularInline):
     extra = 0
     
 class order(admin.ModelAdmin):
-    list_display = ['user','status','table_id','quantity']
-    list_editable = ['status','quantity']
+    list_display = ['user','status','table_id']
+    list_editable = ['status']
     search_fields = ['status','table_id']
     list_filter = ['status','table_id']
     inlines = [OrderItemInline]
@@ -37,7 +37,7 @@ class table(admin.ModelAdmin):
     list_per_page = 10
 
 admin.site.register(Food,food) #First order from model,second from admin
-# admin.site.register(OrderItem)
+admin.site.register(OrderItem)
 admin.site.register(Order,order)
 admin.site.register(Category,category)
 admin.site.register(Table,table)
