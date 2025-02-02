@@ -14,7 +14,7 @@ class Food(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField( null=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
-    price = models.DecimalField(decimal_places=2,default=0.00,max_digits=500)
+    price = models.FloatField(default=0.00)
     
     def __str__(self):
         return self.name

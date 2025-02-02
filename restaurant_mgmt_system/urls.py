@@ -1,7 +1,7 @@
 from django.urls import path,include
 from .views import *
 from rest_framework.routers import DefaultRouter
-
+from debug_toolbar.toolbar import debug_toolbar_urls
 
 router = DefaultRouter()
 router.register(r'category',category,basename="category")
@@ -18,4 +18,4 @@ urlpatterns = [
     path("order_item_list",orderItemList.as_view()),
     path("order_item_list/<pk>",singleOrderItem.as_view()),
     path('',include(router.urls)),
-]
+]+ debug_toolbar_urls()

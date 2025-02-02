@@ -6,6 +6,7 @@ from .serializers import *
 from rest_framework import status,viewsets
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
+from rest_framework.pagination import PageNumberPagination
 
 # using function views
   
@@ -79,41 +80,41 @@ def singleOrderData(request,pk):
         return Response({"Details":"Details Have been updated"})
     
 # Using ViewSets
-class category(viewsets.ViewSet):
-    def list(self,request):
-        queryset = Category.objects.all()
-        serializers = CategorySerializer(queryset,many= True)
-        return Response(serializers.data)
+# class category(viewsets.ViewSet):
+#     def list(self,request):
+#         queryset = Category.objects.all()
+#         serializers = CategorySerializer(queryset,many= True)
+#         return Response(serializers.data)
     
-    def retrieve(self,request,pk):
-        queryset = Category.objects.get(pk = pk)
-        serializer = CategorySerializer(queryset)
-        return Response(serializer.data)
+#     def retrieve(self,request,pk):
+#         queryset = Category.objects.get(pk = pk)
+#         serializer = CategorySerializer(queryset)
+#         return Response(serializer.data)
         
-    def update(self,request,pk):
-        queryset = Category.objects.get(pk = pk)
-        serializer = CategorySerializer(queryset, data = request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"Details":"Data has been updated"},status=status.HTTP_200_OK)
+#     def update(self,request,pk):
+#         queryset = Category.objects.get(pk = pk)
+#         serializer = CategorySerializer(queryset, data = request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({"Details":"Data has been updated"},status=status.HTTP_200_OK)
     
-    def destroy(self,request,pk):
-        queryset = Category.objects.get(pk = pk)
+#     def destroy(self,request,pk):
+#         queryset = Category.objects.get(pk = pk)
         
-        total_usage = OrderItem.objects.filter(food__category = queryset).count()
+#         total_usage = OrderItem.objects.filter(food__category = queryset).count()
         
-        if total_usage > 0 :
-            return Response({"Details":"Category is used"},status=status.HTTP_226_IM_USED)
+#         if total_usage > 0 :
+#             return Response({"Details":"Category is used"},status=status.HTTP_226_IM_USED)
         
-        else:
-            queryset.delete()
-            return Response({"Details":"Data is Deleted"},status=status.HTTP_200_OK)
+#         else:
+#             queryset.delete()
+#             return Response({"Details":"Data is Deleted"},status=status.HTTP_200_OK)
         
-    def create(self,request):
-        serializer = CategorySerializer(data = request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+#     def create(self,request):
+#         serializer = CategorySerializer(data = request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data)
 
 # Using Generic API View
 class tables(ListCreateAPIView):
@@ -159,3 +160,45 @@ class singleOrderItem(APIView):
         queryset = OrderItem.objects.get(pk = pk)
         queryset.delete()
         return Response({"Details":"Data has been Deleted"})
+    
+class category(viewsets.ModelViewSet):
+    
+    # queryset = Category.objects.select_related(Category).all()
+    queryset = Category.objects.all()
+    
+    serializer_class = CategorySerializer
+    pagination_class = PageNumberPagination
+    # def list(self,request):
+    #     queryset = Category.objects.all()
+    #     serializers = CategorySerializer(queryset,many= True)
+    #     return Response(serializers.data)
+    
+    # def retrieve(self,request,pk):
+    #     queryset = Category.objects.get(pk = pk)
+    #     serializer = CategorySerializer(queryset)
+    #     return Response(serializer.data)
+        
+    # def update(self,request,pk):
+    #     queryset = Category.objects.get(pk = pk)
+    #     serializer = CategorySerializer(queryset, data = request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response({"Details":"Data has been updated"},status=status.HTTP_200_OK)
+    
+    # def destroy(self,request,pk):
+    #     queryset = Category.objects.get(pk = pk)
+        
+    #     total_usage = OrderItem.objects.filter(food__category = queryset).count()
+        
+    #     if total_usage > 0 :
+    #         return Response({"Details":"Category is used"},status=status.HTTP_226_IM_USED)
+        
+    #     else:
+    #         queryset.delete()
+    #         return Response({"Details":"Data is Deleted"},status=status.HTTP_200_OK)
+        
+    # def create(self,request):
+    #     serializer = CategorySerializer(data = request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(serializer.data)

@@ -30,9 +30,20 @@ class CategorySerializer(serializers.ModelSerializer):
             
     
 class FoodSerializer(serializers.ModelSerializer):
+    
+    vat_price = serializers.SerializerMethodField()
+    category = serializers.StringRelatedField()
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset = Category.objects.all(),
+        source = "category"
+        )
+
     class Meta:
         model = Food
-        fields = ['id','name','description','category','price']
+        fields = ['id','name','description','category',"category_id",'price','vat_price']
+    
+    def get_vat_price(self,food:Food):
+        return food.price *0.13 +food.price
         
     def create(self,validated_data):
         occurences = self.Meta.model.objects.filter(name = validated_data.get('name'),category = validated_data.get('category')).count()
