@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'restaurant_mgmt_system',
     'rest_framework',
     'debug_toolbar',
+    'rest_framework.authtoken',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -138,8 +140,8 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
-
 REST_FRAMEWORK = {
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
 }

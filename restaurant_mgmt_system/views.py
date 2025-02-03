@@ -7,7 +7,9 @@ from rest_framework import status,viewsets
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.pagination import PageNumberPagination
-
+from .paginators import *
+from rest_framework import filters
+from .permission import *
 # using function views
   
 @api_view(['GET','POST'])
@@ -143,7 +145,7 @@ class orderItemList(APIView):
     
 
 class singleOrderItem(APIView):
-    
+        
     def get(self,request,pk):
         queryset = OrderItem.objects.get(pk = pk)
         serializer = OrderItemsSerializer(queryset)
@@ -167,7 +169,14 @@ class category(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     
     serializer_class = CategorySerializer
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
+    permission_classes = [IsAuthemticatedOrReadOnly]
+    
+    
+    
+    
     # def list(self,request):
     #     queryset = Category.objects.all()
     #     serializers = CategorySerializer(queryset,many= True)
@@ -202,3 +211,4 @@ class category(viewsets.ModelViewSet):
     #     serializer.is_valid(raise_exception=True)
     #     serializer.save()
     #     return Response(serializer.data)
+

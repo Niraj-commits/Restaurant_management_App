@@ -31,9 +31,9 @@ class CategorySerializer(serializers.ModelSerializer):
     
 class FoodSerializer(serializers.ModelSerializer):
     
-    vat_price = serializers.SerializerMethodField()
-    category = serializers.StringRelatedField()
-    category_id = serializers.PrimaryKeyRelatedField(
+    vat_price = serializers.SerializerMethodField() #create new function to add extra data
+    category = serializers.StringRelatedField() #to add name from a foreign table
+    category_id = serializers.PrimaryKeyRelatedField(  #to add the id as well
         queryset = Category.objects.all(),
         source = "category"
         )
@@ -42,7 +42,7 @@ class FoodSerializer(serializers.ModelSerializer):
         model = Food
         fields = ['id','name','description','category',"category_id",'price','vat_price']
     
-    def get_vat_price(self,food:Food):
+    def get_vat_price(self,food:Food): #get is method and vat_price is declared variable
         return food.price *0.13 +food.price
         
     def create(self,validated_data):
