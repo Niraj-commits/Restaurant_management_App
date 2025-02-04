@@ -10,6 +10,9 @@ from rest_framework.pagination import PageNumberPagination
 from .paginators import *
 from rest_framework import filters
 from .permission import *
+from django_filters import rest_framework as filter
+from .filters import *
+
 # using function views
   
 @api_view(['GET','POST'])
@@ -170,10 +173,11 @@ class category(viewsets.ModelViewSet):
     
     serializer_class = CategorySerializer
     pagination_class = CustomPagination
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter,filter.DjangoFilterBackend]
+    filterset_fields = ['name']
     search_fields = ['name']
-    permission_classes = [IsAuthemticatedOrReadOnly]
-    
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filterset_class = customCategoryFilter
     
     
     
