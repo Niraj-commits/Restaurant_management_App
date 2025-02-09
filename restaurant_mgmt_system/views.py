@@ -13,8 +13,7 @@ from .permission import *
 from django_filters import rest_framework as filter
 from .filters import *
 
-# using function views
-  
+
 @api_view(['GET','POST'])
 def foodList(request):
     if request.method == "GET":
